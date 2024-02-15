@@ -48,7 +48,8 @@ def register():
                 return jsonify({"error": "Password must be at least 8 characters, contain 1 uppercase, 1 number, and 1 special character (@$!%*?&)"}), 400
 
             # Validate name length (alphabetic characters only)
-            if len(data["name"]) < 4 or not data["name"].isalpha():
+            name_regex=r'^[A-Za-z ,.]+$'
+            if len(data["name"]) < 4 or not re.match(name_regex, data["name"]):
                 return jsonify({"error": "Name must be at least 4 alphabetic characters"}), 400
             
             if len(data["address"]) < 10:
@@ -86,15 +87,14 @@ def login():
     logger=current_app.config['logger']
     @limiter.limit("1 per minute")  # Additional rate limiting for this endpoint
     def exec_login():
-        try:
-            eml = request.json.get("email")
-            password = request.json.get("password")
-            
-            email_regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-            if not re.match(email_regex, eml):
-                return jsonify({"error": "Invalid email format"}), 400
-        except KeyError as e:
-            return jsonify({"error": "Missing required field: " + str(e)}), 400
+        eml = request.json.get("email")
+        password = request.json.get("password")
+        
+        if (eml==None): return jsonify({"error": "Missing required field: email"}), 400
+        if (password==None): return jsonify({"error": "Missing required field: password"}), 400
+
+        email_regex = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+        if not re.match(email_regex, eml): return jsonify({"error": "Invalid email format"}), 400
         
         try:
             with db_session as sesi:
@@ -105,7 +105,7 @@ def login():
                 
                 if check_password_hash(hashed_password, password):  # No need to encode password
                     if (user.is_active==False):
-                        return jsonify({"message": "User Inactive! Please contact Administrator for further process."}), 401
+                        return jsonify({"message": "User Inactive! Please contact Administrator for further process."}), 403
                     login_user(user)
                     session['user_id'] = user.id  # Store user ID in session
                     # Create and save a session token for authentication manually
@@ -151,22 +151,25 @@ def edit_user_profile():
         data = request.get_json()
 
         # Validate user input
-        try:
-            name = data.get("name",current_user.name)
-            phone_number = data.get("phone_number",current_user.phone_number)
-            address = data.get("address",current_user.address)
-            password = data["password"]
+        name = data.get("name",current_user.name)
+        phone_number = data.get("phone_number",current_user.phone_number)
+        address = data.get("address",current_user.address)
+        password = data.get("password")
 
-            if len(name) < 4 or not name.isalpha():
-                return jsonify({"error": "Name must be at least 4 alphabetic characters"}), 400
-            if len(address) < 10:
-                return jsonify({"error": "Address must be at least 10 characters"}), 400
-            if not phone_number.isdigit():
-                return jsonify({"error": "Phone must be number only"}), 400            
-            if check_password_hash(current_user.password, password)==False:
-                return jsonify({"error": "Please re-type your password"}), 400
-        except KeyError as e:
-            return jsonify({"error": "Missing required field: " + str(e)}), 400
+        name_regex=r'^[A-Za-z ,.]+$'
+        
+        if len(name) < 4 or not re.match(name_regex, name):
+            return jsonify({"error": "Name must be at least 4 alphabetic characters"}), 400
+        
+        if len(address) < 10:
+            return jsonify({"error": "Address must be at least 10 characters"}), 400
+        
+        if not phone_number.isdigit():
+            return jsonify({"error": "Phone must be number only"}), 400 
+                   
+        if (password==None): return jsonify({"error": "Missing required field: password"}), 400
+        if check_password_hash(current_user.password, password)==False:
+            return jsonify({"error": "Incorrect password"}), 401
         
         current_user.name = name
         current_user.phone_number = phone_number
