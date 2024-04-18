@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "Telebot-webhook"
+version = "0.1.0"
+description = "Telegram bot using webhook method. The bot will echo back any chat by user except '/start' that will trigger a greeting message. For best security practice, URL for webhook and the telegram API token added to config.py file"
+authors = ["None"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+python-telegram-bot = "^21.1.1"
+aiohttp = "^3.9.4"
+asyncio = "^3.4.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
