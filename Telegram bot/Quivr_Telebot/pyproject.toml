@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "quivr-telebot"
+version = "0.1.0"
+description = ""
+authors = ["Teguh"]
+readme = "README.md"
+packages = [{include = "quivr_telebot"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+requests = "^2.31.0"
+python-telegram-bot = "^21.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
