@@ -6,7 +6,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.ERROR)
 
 from aiohttp import web
-from config import secret_token, tele_token, url
+from config import tele_token, url
 from telegram import Bot, Update
 from telegram.ext import (ApplicationBuilder, CommandHandler, ContextTypes,
                           MessageHandler, filters)
