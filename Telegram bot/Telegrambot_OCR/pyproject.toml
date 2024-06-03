@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "telegrambot-ocr"
+version = "0.1.0"
+description = ""
+authors = ["Teguh S. <tiofilus86@gmail.com>"]
+readme = "README.md"
+packages = [{include = "telegrambot_ocr"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+python-telegram-bot = "^21.2"
+pillow = "^10.3.0"
+pytesseract = "^0.3.10"
+requests = "^2.32.3"
+opencv-python-headless = "^4.9.0.80"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
